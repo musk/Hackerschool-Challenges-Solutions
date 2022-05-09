@@ -77,6 +77,20 @@ HANGMAN = [
     """
        +++++++++++++++++++++++++++
        +         __________      +
+       +         || /            +
+       +         ||/             +
+       +         ||              +
+       +         ||              +
+       +         ||              +
+       +       ******            +
+       +      ********           +
+       +                         +
+       + {}          +
+       +++++++++++++++++++++++++++
+       """,
+    """
+       +++++++++++++++++++++++++++
+       +         __________      +
        +         || /      |     +
        +         ||/             +
        +         ||              +
@@ -107,7 +121,7 @@ HANGMAN = [
        +         __________      +
        +         || /      |     +
        +         ||/       O     +
-       +         ||       /|\\    +
+       +         ||        |     +
        +         ||              +
        +         ||              +
        +       ******            +
@@ -120,8 +134,22 @@ HANGMAN = [
        +++++++++++++++++++++++++++
        +         __________      +
        +         || /      |     +
-       +         ||/       O     +
-       +         ||       /|\\    +
+       +         ||/      \\O/    +
+       +         ||        |     +
+       +         ||              +
+       +         ||              +
+       +       ******            +
+       +      ********           +
+       +                         +
+       + {}          +
+       +++++++++++++++++++++++++++
+       """,
+    """
+       +++++++++++++++++++++++++++
+       +         __________      +
+       +         || /      |     +
+       +         ||/      \\O/    +
+       +         ||        |     +
        +         ||       / \\    +
        +         ||              +
        +       ******            +
@@ -131,6 +159,70 @@ HANGMAN = [
        +++++++++++++++++++++++++++
        """
 ]
+
+
+def print_hangman(level=1000, print_errors=True):
+    lvl = min(level, len(HANGMAN) - 1)
+    error_txt = "              "
+    if print_errors:
+        error_txt = f" Fehler: {lvl} / {len(HANGMAN) - 1}"
+    print(HANGMAN[lvl].format(error_txt))
+
+
+def intro():
+    print("""
+    
+             Willkommen 
+    Lass uns Galgenmännchen spielen
+      
+       +++++++++++++++++++++++++++
+       +         __________      +
+       +         || /      |     +
+       +         ||/       O     +
+       +         ||       /|\\    +
+       +         ||       / \\    +
+       +         ||              +
+       +       ******            +
+       +      ********           +
+       +                         +
+       +++++++++++++++++++++++++++
+       
+    Wir haben ein Wort für sie ausgesucht!
+       """)
+
+
+def print_loosing_screen():
+    print("""
+       +++++++++++++++++++++++++++
+       +         __________      +
+       +         || /      |     +
+       +         ||/       O     +
+       +         ||       /|\\    +
+       +         ||       / \\    +
+       +         ||              +
+       +       ******            +
+       +      ********           +
+       +                         +
+       +       VERLOREN!!!       +
+       +++++++++++++++++++++++++++
+       """)
+
+
+def print_winning_screen():
+    print("""
+       +++++++++++++++++++++++++++
+       +         __________      +
+       +         || /            +
+       +         ||/             +
+       +         ||              +
+       +         ||              +
+       +         ||       \\0/    +
+       +       ******      |     +
+       +      ********    / \\    +
+       +                         +
+       +       GEWONNEN!!!       +
+       +++++++++++++++++++++++++++
+       """)
 
 
 def print_word(solution, words, guessed_letters):
@@ -150,26 +242,6 @@ def print_word(solution, words, guessed_letters):
             print(f"DEBUG: {solution_}")
     else:
         raise ValueError("Game was not initilaized!")
-
-
-def print_hangman(level=1000, print_errors=True):
-    lvl = min(level, len(HANGMAN) - 1)
-    error_txt = "              "
-    if print_errors:
-        error_txt = f" Fehler: {lvl} / {len(HANGMAN) - 1}"
-    print(HANGMAN[lvl].format(error_txt))
-
-
-def game_lost(errors):
-    return errors >= len(HANGMAN) - 1
-
-
-def game_won(words, solution, guessed_letters):
-    for letter in words[solution]:
-        if letter.upper() in guessed_letters:
-            continue
-        return False
-    return True
 
 
 def read_words(file):
@@ -258,6 +330,33 @@ def guess_letter(level, words, solution, guessed_letters):
         return level + 1
 
 
+def game_lost(errors):
+    return errors >= len(HANGMAN) - 1
+
+
+def game_won(words, solution, guessed_letters):
+    for letter in words[solution]:
+        if letter.upper() in guessed_letters:
+            continue
+        return False
+    return True
+
+
+def is_game_finished(guessed_letters, hangman_lvl, solution, words):
+    if game_lost(errors=hangman_lvl):
+        print(f"Schade du hast verloren! Das gesuchte Wort ist '{words[solution]}'!")
+        print_loosing_screen()
+        return True
+    elif game_won(words=words,
+                  solution=solution,
+                  guessed_letters=guessed_letters):
+        print(f"Super du hast das Wort '{words[solution]}' erraten!")
+        print_winning_screen()
+        return True
+    else:
+        return False
+
+
 def replay():
     answer = input("Möchtest du erneut spielen? Dann schreibe jetzt 'Ja':")
     if answer.lower() == "ja":
@@ -266,25 +365,21 @@ def replay():
         return False
 
 
-def intro():
-    print("Willkommen bei Galgenmännchen")
-    print_hangman(print_errors=False)
-    print("Wir haben ein Wort für sie ausgesucht!")
-
-
 def start():
     words = init_words(True)
     solution, hangman_lvl, solved, guessed_letters = init_game(words=words)
     intro()
+    print_word(solution=solution, words=words, guessed_letters=guessed_letters)
     while not solved:
         hangman_lvl = guess_letter(level=hangman_lvl,
                                    words=words,
                                    solution=solution,
                                    guessed_letters=guessed_letters)
-        print_hangman(level=hangman_lvl )
+        print_hangman(level=hangman_lvl)
         print_word(solution=solution,
                    words=words,
                    guessed_letters=guessed_letters)
+
         answer = input("Möchtest du das Wort erraten? (Tippe Ja):")
         if answer.upper() == "JA":
             hangman_lvl = guess_word(level=hangman_lvl,
@@ -292,28 +387,15 @@ def start():
                                      solution=solution,
                                      guessed_letters=guessed_letters)
 
-        if game_lost(errors=hangman_lvl):
-            print(
-                f"Schade du hast verloren! Das gesuchte Wort ist '{words[solution]}'!"
-            )
-            print_hangman(level=hangman_lvl )
+        if is_game_finished(guessed_letters=guessed_letters, hangman_lvl=hangman_lvl, solution=solution, words=words):
             if replay():
-                continue
-            else:
-                break
-        elif game_won(words=words,
-                      solution=solution,
-                      guessed_letters=guessed_letters):
-            print(f"Super du hast das Wort '{words[solution]}' erraten!")
-            if replay():
-                solution, hangman_lvl, solved, guessed_letters = init_game(
-                    words=words)
+                solution, hangman_lvl, solved, guessed_letters = init_game(words=words)
                 intro()
+                print_word(solution=solution, words=words, guessed_letters=guessed_letters)
             else:
                 break
 
     print("Danke das du mit mir Galgenmännchen gespielt hast!")
-    print_hangman(print_errors=False)
     print("Bis zum nächsten mal.")
 
 
