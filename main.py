@@ -1,3 +1,4 @@
 from hangman import hangman
 
-hangman.main()
+if __name__ ==  "__main__":
+    hangman.start()
