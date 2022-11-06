@@ -179,7 +179,7 @@ def print_hangman(level=1000, print_errors=True):
     error_txt = "              "
     if print_errors:
         lvl_txt = f"{lvl}"
-        if (lvl < 10):
+        if lvl < 10:
             lvl_txt = f" {lvl}"
         error_txt = f" Fehler: {lvl_txt} / {len(HANGMAN) - 1}"
     # verwendet die Funktion str.format um den Fehlertext in die Ausgabe einzubetten
@@ -362,7 +362,8 @@ def choose_word(words):
 
 def guess_word(mistakes, word, guessed_letters):
     """
-    Fragt nach einer Lösung für das Wort und gibt die Anzahl der Fehler zurück. Wird das Wort falsch geraten wird die Fehleranzahl hochgezählt.
+    Fragt nach einer Lösung für das Wort und gibt die Anzahl der Fehler zurück. Wird das Wort falsch geraten wird die
+    Fehleranzahl hochgezählt.
     :param mistakes: Anzahl der Fehler
     :param word: Das gesuchte Wort
     :param guessed_letters: Liste mit den bereits erratenen Buchstaben
@@ -375,8 +376,8 @@ def guess_word(mistakes, word, guessed_letters):
         if entered_word.upper() == word.upper():
             # Die Wörter sind gleich also fügen wir alle Buchstaben in die Liste der erratenen Buchstaben ein
             # damit die Siegbedingung erfüllt ist.
-            for l in entered_word:
-                guessed_letters.append(l.upper())
+            for letter in entered_word:
+                guessed_letters.append(letter.upper())
             return mistakes
         else:
             # Das Wort war falsch also erhöhen wir die Fehlerzahl um 1 und geben das Galgenmännchen aus.
